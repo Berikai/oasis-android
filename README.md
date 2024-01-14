@@ -4,11 +4,10 @@ An android application for OASIS, the student information system of Izmir Univer
 ## Behind the Scene
 It's basically a WebView attached to the ContentView of the application which loads [OASIS](https://oasis.izmirekonomi.edu.tr) URL. So, it's actually a wrapper of the original web application. 
 
-The main trick this app does is storing the credentials of the user account on the installed device. It is being done by injecting javascript into the WebView. 
-The injected script calls Kotlin functions back from the app with Android Javascript Interface method. By doing so, it gathers user credentials from the html input elements.
+The main trick this app does is storing the credentials of the user account on the installed device. It is being done by injecting Javascript into the WebView. 
+The injected script calls Kotlin functions back from the app with Android Javascript Interface method. 
+By doing so, it gathers user credentials from the HTML input elements and it simulates the log in process under the hood by sending HTTP requests and gets the session cookie.
 It automatically logs in with these gathered credentials when session expires and creates a seemless experience of unexpiring session.
-
-It simulates the log in process under the hood by sending HTTP requests and gets the session cookie.
 
 ## Motivation
 When there is a message from the lecturers, an SMS is being sent by YBS about there is a message to be seen on OASIS without the content of the message. 
