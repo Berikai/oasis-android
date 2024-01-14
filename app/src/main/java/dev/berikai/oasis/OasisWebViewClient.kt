@@ -16,6 +16,7 @@ object AndroidJSInterface {
 
     @JavascriptInterface
     fun logout() {
+        CookieManager.getInstance().setCookie(oasis, "")
         with(preferences!!.edit()) {
             putString("username", "")
             putString("password", "")
