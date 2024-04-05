@@ -1,9 +1,12 @@
 package dev.berikai.oasis
 
+import java.io.BufferedReader
+import java.io.InputStream
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
+
 
 fun sendPostBody(outputStream: OutputStream, body: String) {
     val os: OutputStream = outputStream
@@ -38,6 +41,15 @@ fun sendPost(address: String, body: String, cookie: String): HttpURLConnection {
     }
 }
 
+fun readResponseBody(inputStream: InputStream): String {
+    val reader = BufferedReader(inputStream.reader())
+    var content: String
+    reader.use { _reader ->
+        content = _reader.readText()
+    }
+    return content
+}
+
 fun getSessionCookie(oasisAddress: String, username: String, password: String, pin: String): String {
     var cookieReturn = "null"
     val thread = Thread {
@@ -50,8 +62,15 @@ fun getSessionCookie(oasisAddress: String, username: String, password: String, p
             )
             val pinCookie = pinResponse.headerFields["set-cookie"]?.iterator()!!.next()
             val response = sendPost(address, "LoginForm%5Bpin%5D=$pin", pinCookie)
-            val cookie =  response.headerFields["set-cookie"]?.iterator()!!.next().split(";")[0]
-            cookieReturn = cookie
+            val cookie = response.headerFields["set-cookie"]?.iterator()!!.next().split(";")[0]
+
+            val responseBody = readResponseBody(response.inputStream)
+            if(!(responseBody.contains("Please try again after 5 minutes later.")
+                        || responseBody.contains("Since you have logged in recently, please try again in 5 minutes.")
+                        || responseBody.contains("Sisteme girişleriniz arasında en az 5 dakika süre olmalıdır. / There has to be at least 5 minutes between consecutive login attempts."))
+            ) {
+                cookieReturn = cookie
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
